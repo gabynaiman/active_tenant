@@ -1,17 +1,22 @@
 # -*- encoding: utf-8 -*-
 require File.expand_path('../lib/active_tenant/version', __FILE__)
 
-Gem::Specification.new do |gem|
-  gem.authors       = ["gabriel"]
-  gem.email         = ["gnaiman@keepcon.com"]
-  gem.description   = %q{TODO: Write a gem description}
-  gem.summary       = %q{TODO: Write a gem summary}
-  gem.homepage      = ""
+Gem::Specification.new do |s|
+  s.name          = 'active_tenant'
+  s.version       = ActiveTenant::VERSION
+  s.authors       = ['Gabriel Naiman']
+  s.email         = ['gabynaiman@gmail.com']
+  s.description   = 'ActiveRecord extensions for multi tenant applications'
+  s.summary       = 'ActiveRecord extensions for multi tenant applications'
+  s.homepage      = 'https://github.com/gabynaiman/active_tenant'
 
-  gem.files         = `git ls-files`.split($\)
-  gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
-  gem.test_files    = gem.files.grep(%r{^(test|spec|features)/})
-  gem.name          = "active_tenant"
-  gem.require_paths = ["lib"]
-  gem.version       = ActiveTenant::VERSION
+  s.files         = `git ls-files`.split($\)
+  s.executables   = s.files.grep(%r{^bin/}).map{ |f| File.basename(f) }
+  s.test_files    = s.files.grep(%r{^(test|spec|features)/})
+  s.require_paths = ["lib"]
+
+  s.add_dependency 'active_record', '>= 3.0.0'
+
+  s.add_development_dependency 'pg'
+  s.add_development_dependency 'rspec'
 end

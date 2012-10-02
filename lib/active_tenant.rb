@@ -1,4 +1,4 @@
-require "active_tenant/version"
+require 'active_tenant/version'
 
 module ActiveTenant
   # Your code goes here...

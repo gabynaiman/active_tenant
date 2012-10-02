@@ -1,6 +1,6 @@
 # ActiveTenant
 
-TODO: Write a gem description
+ActiveRecord extensions for multi tenant applications
 
 ## Installation
 
