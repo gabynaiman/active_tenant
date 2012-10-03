@@ -38,11 +38,11 @@ module ActiveTenant
       end
     end
 
+    private
+
     def current_name
       File.basename(connection_config[:database], '.sqlite3')
     end
-
-    private
 
     def database_path
       File.dirname(connection_config[:database])
