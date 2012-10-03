@@ -18,7 +18,17 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+    ActiveRecord::Base.create_tenant 'customer_name'
+
+    ActiveRecord::Migration.migrate_tenant 'customer_name'
+    # or
+    ActiveRecord::Migration.migrate_all_tenants
+
+    ActiveRecord::Base.with_tenant 'customer_name' do
+      Porduct.find(1234)
+    end
+
+    ActiveRecord::Base.remove_tenant 'customer_name'
 
 ## Contributing
 

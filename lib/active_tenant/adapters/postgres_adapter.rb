@@ -1,6 +1,6 @@
 module ActiveTenant
   class PostgresAdapter
-    delegate :connection_config, :establish_connection, :connection, to: ActiveRecord::Base
+    delegate :connection_config, :establish_connection, :connection, to: ::ActiveRecord::Base
 
     def all
       connection.select_values("SELECT nspname FROM pg_namespace WHERE nspname NOT IN ('information_schema', 'public') AND nspname NOT LIKE 'pg%'")

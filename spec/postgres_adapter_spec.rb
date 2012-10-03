@@ -74,75 +74,90 @@ describe ActiveTenant::PostgresAdapter do
 
   context 'Generic adapter' do
 
-    let(:active_tenant) { ActiveTenant::Base.new }
-
     it 'Adapter operations' do
-      active_tenant.create 'dummy'
-      active_tenant.all.should include 'dummy'
+      ActiveTenant.current.create 'dummy'
+      ActiveTenant.current.all.should include 'dummy'
 
       ActiveRecord::Base.connection_config[:schema_search_path].should eq 'public'
 
-      active_tenant.with 'dummy' do
+      ActiveTenant.current.with 'dummy' do
         ActiveRecord::Base.connection_config[:schema_search_path].should eq 'dummy'
       end
 
       ActiveRecord::Base.connection_config[:schema_search_path].should eq 'public'
 
-      active_tenant.remove 'dummy'
-      active_tenant.all.should_not include 'dummy'
+      ActiveTenant.current.remove 'dummy'
+      ActiveTenant.current.all.should_not include 'dummy'
     end
 
     it 'Migrate one tenant' do
-      active_tenant.create 'dummy_1'
-      active_tenant.create 'dummy_2'
+      ActiveTenant.current.create 'dummy_1'
+      ActiveTenant.current.create 'dummy_2'
 
-      active_tenant.migrate 'dummy_1'
+      ActiveTenant.current.migrate 'dummy_1'
 
-      active_tenant.with 'dummy_1' do
+      ActiveTenant.current.with 'dummy_1' do
         ActiveRecord::Base.connection.table_exists?('users').should be_true
         ActiveRecord::Base.connection.table_exists?('countries').should be_true
       end
 
-      active_tenant.with 'dummy_2' do
+      ActiveTenant.current.with 'dummy_2' do
         ActiveRecord::Base.connection.table_exists?('users').should_not be_true
         ActiveRecord::Base.connection.table_exists?('countries').should_not be_true
       end
 
-      active_tenant.remove 'dummy_1'
-      active_tenant.remove 'dummy_2'
+      ActiveTenant.current.remove 'dummy_1'
+      ActiveTenant.current.remove 'dummy_2'
     end
 
     it 'Migrate all tenants' do
-      active_tenant.create 'dummy_1'
-      active_tenant.create 'dummy_2'
+      ActiveTenant.current.create 'dummy_1'
+      ActiveTenant.current.create 'dummy_2'
 
-      active_tenant.migrate_all
+      ActiveTenant.current.migrate_all
 
-      active_tenant.with 'dummy_1' do
+      ActiveTenant.current.with 'dummy_1' do
         ActiveRecord::Base.connection.table_exists?('users').should be_true
         ActiveRecord::Base.connection.table_exists?('countries').should be_true
       end
 
-      active_tenant.with 'dummy_2' do
+      ActiveTenant.current.with 'dummy_2' do
         ActiveRecord::Base.connection.table_exists?('users').should be_true
         ActiveRecord::Base.connection.table_exists?('countries').should be_true
       end
 
-      active_tenant.remove 'dummy_1'
-      active_tenant.remove 'dummy_2'
+      ActiveTenant.current.remove 'dummy_1'
+      ActiveTenant.current.remove 'dummy_2'
     end
 
     it 'Migrate to specific version' do
-      active_tenant.create 'dummy'
+      ActiveTenant.current.create 'dummy'
 
-      active_tenant.migrate_all 20120823132854
+      ActiveTenant.current.migrate_all 20120823132854
 
-      active_tenant.with 'dummy' do
+      ActiveTenant.current.with 'dummy' do
         ActiveRecord::Base.connection.table_exists?('users').should be_true
         ActiveRecord::Base.connection.table_exists?('countries').should_not be_true
       end
 
-      active_tenant.remove 'dummy'
+      ActiveTenant.current.remove 'dummy'
+    end
+
+  end
+
+  context 'ActiveRecord extensions' do
+
+    it 'Create, migrate and remove' do
+      ActiveRecord::Base.create_tenant 'dummy'
+
+      ActiveRecord::Migration.migrate_tenant 'dummy'
+
+      ActiveRecord::Base.with_tenant 'dummy' do
+        ActiveRecord::Base.connection.table_exists?('users').should be_true
+        ActiveRecord::Base.connection.table_exists?('countries').should be_true
+      end
+
+      ActiveRecord::Base.remove_tenant 'dummy'
     end
 
   end

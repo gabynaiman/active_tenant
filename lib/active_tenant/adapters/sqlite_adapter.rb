@@ -1,6 +1,6 @@
 module ActiveTenant
   class SQLiteAdapter
-    delegate :connection_config, :establish_connection, :connection, to: ActiveRecord::Base
+    delegate :connection_config, :establish_connection, :connection, to: ::ActiveRecord::Base
 
     def all
       path = database_path

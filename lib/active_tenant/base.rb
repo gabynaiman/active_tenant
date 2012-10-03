@@ -9,7 +9,7 @@ module ActiveTenant
 
     def migrate(name, version=nil)
       with name do
-        ActiveRecord::Migrator.migrate(ActiveRecord::Migrator.migrations_path, version)
+        ::ActiveRecord::Migrator.migrate(::ActiveRecord::Migrator.migrations_path, version)
       end
     end
 
@@ -22,7 +22,7 @@ module ActiveTenant
     private
 
     def adapter
-      @adapter ||= ADAPTERS[ActiveRecord::Base.connection_config[:adapter].to_sym].new
+      @adapter ||= ADAPTERS[::ActiveRecord::Base.connection_config[:adapter].to_sym].new
     end
 
   end
