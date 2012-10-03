@@ -125,6 +125,19 @@ describe ActiveTenant::SQLiteAdapter do
       active_tenant.remove 'dummy_2'
     end
 
+    it 'Migrate to specific version' do
+      active_tenant.create 'dummy'
+
+      active_tenant.migrate_all 20120823132854
+
+      active_tenant.with 'dummy' do
+        ActiveRecord::Base.connection.table_exists?('users').should be_true
+        ActiveRecord::Base.connection.table_exists?('countries').should_not be_true
+      end
+
+      active_tenant.remove 'dummy'
+    end
+
   end
 
 end
