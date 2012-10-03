@@ -1,5 +1,5 @@
-require 'active_tenant/version'
+require 'active_record'
 
-module ActiveTenant
-  # Your code goes here...
-end
+require 'active_tenant/version'
+require 'active_tenant/adapters/sqlite_adapter'
+require 'active_tenant/adapters/postgres_adapter'
