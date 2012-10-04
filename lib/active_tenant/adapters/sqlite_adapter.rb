@@ -2,9 +2,13 @@ module ActiveTenant
   class SQLiteAdapter
     delegate :connection_config, :establish_connection, :connection, to: ::ActiveRecord::Base
 
+    def initialize
+      self.global = ActiveTenant.configuration.global if ActiveTenant.configuration.global
+    end
+
     def all
       path = database_path
-      Dir.glob("#{path}/*.sqlite3").map { |f| File.basename(f, '.sqlite3') }
+      Dir.glob("#{path}/*.sqlite3").map { |f| File.basename(f, '.sqlite3') } - [global]
     end
 
     def create(name)
@@ -22,7 +26,7 @@ module ActiveTenant
     end
 
     def with(name)
-      return yield if name == current_name
+      return yield if name == self.name
 
       current_config = connection_config
       ex = nil
@@ -38,10 +42,18 @@ module ActiveTenant
       end
     end
 
+    def name
+      File.basename(connection_config[:database], '.sqlite3')
+    end
+
+    def global
+      @global
+    end
+
     private
 
-    def current_name
-      File.basename(connection_config[:database], '.sqlite3')
+    def global=(name)
+      @global = name
     end
 
     def database_path

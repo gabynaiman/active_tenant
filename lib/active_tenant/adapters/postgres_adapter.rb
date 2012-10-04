@@ -2,8 +2,12 @@ module ActiveTenant
   class PostgresAdapter
     delegate :connection_config, :establish_connection, :connection, to: ::ActiveRecord::Base
 
+    def initialize
+      self.global = ActiveTenant.configuration.global if ActiveTenant.configuration.global
+    end
+
     def all
-      connection.select_values("SELECT nspname FROM pg_namespace WHERE nspname NOT IN ('information_schema', 'public') AND nspname NOT LIKE 'pg%'")
+      connection.select_values("SELECT nspname FROM pg_namespace WHERE nspname <> 'information_schema' AND nspname NOT LIKE 'pg%'") - [global]
     end
 
     def create(name)
@@ -35,7 +39,19 @@ module ActiveTenant
       end
     end
 
+    def name
+      search_path
+    end
+
+    def global
+      @global || 'public'
+    end
+
     private
+
+    def global=(name)
+      @global = name
+    end
 
     def search_path(name=nil)
       if name

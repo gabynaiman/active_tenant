@@ -1,0 +1,209 @@
+require 'spec_helper'
+
+ActiveTenant::Base::ADAPTERS.keys.each do |adapter_name|
+  adapter = ActiveTenant::Base::ADAPTERS[adapter_name]
+
+  describe adapter do
+
+    before :all do
+      AdapterTestHelper.before_all adapter_name
+    end
+
+    after :all do
+      AdapterTestHelper.after_all adapter_name
+    end
+
+    before :each do
+      AdapterTestHelper.before_each adapter_name
+    end
+
+    after :each do
+      AdapterTestHelper.after_each adapter_name
+    end
+
+    context 'Specific adapter' do
+
+      let(:tenant_adapter) { adapter.new }
+
+      it 'List all tenants' do
+        tenants = tenant_adapter.all
+
+        tenants.should be_a Array
+        tenants.should have(:no).items
+      end
+
+      it 'Create a new tenant' do
+        tenant_adapter.create 'new_tenant'
+        tenants = tenant_adapter.all
+
+        tenants.should be_a Array
+        tenants.should have(1).items
+        tenants.should include 'new_tenant'
+      end
+
+      it 'Remove an existing tenant' do
+        tenant_adapter.create 'tenant_to_remove'
+
+        tenant_adapter.all.should include 'tenant_to_remove'
+
+        tenant_adapter.remove 'tenant_to_remove'
+
+        tenant_adapter.all.should_not include 'tenant_to_remove'
+      end
+
+      it 'Evaluate a block into a tenant' do
+        tenant_adapter.name.should eq tenant_adapter.global
+
+        tenant_adapter.create 'dummy'
+
+        tenant_adapter.name.should eq tenant_adapter.global
+
+        tenant_adapter.with 'dummy' do
+          tenant_adapter.name.should eq 'dummy'
+        end
+
+        tenant_adapter.name.should eq tenant_adapter.global
+
+        tenant_adapter.remove 'dummy'
+
+        tenant_adapter.name.should eq tenant_adapter.global
+      end
+
+    end
+
+    context 'Global adapter' do
+
+      it 'Adapter operations' do
+        ActiveTenant.current.create 'dummy'
+        ActiveTenant.current.all.should include 'dummy'
+
+        ActiveTenant.current.name.should eq ActiveTenant.current.global
+
+        ActiveTenant.current.with 'dummy' do
+          ActiveTenant.current.name.should eq 'dummy'
+        end
+
+        ActiveTenant.current.name.should eq ActiveTenant.current.global
+
+        ActiveTenant.current.remove 'dummy'
+        ActiveTenant.current.all.should_not include 'dummy'
+      end
+
+      it 'Migrate global' do
+        ActiveTenant.current.create 'dummy'
+
+        ActiveTenant.current.migrate_global
+
+        ActiveRecord::Base.connection.table_exists?('globals').should be_true
+        ActiveRecord::Base.connection.table_exists?('tenants').should_not be_true
+        ActiveRecord::Base.connection.table_exists?('other_tenants').should_not be_true
+        ActiveRecord::Base.connection.table_exists?('customs').should_not be_true
+
+        ActiveTenant.current.remove 'dummy'
+      end
+
+      it 'Migrate one tenant' do
+        ActiveTenant.current.create 'dummy_1'
+        ActiveTenant.current.create 'dummy_2'
+
+        ActiveTenant.current.migrate 'dummy_1'
+
+        ActiveTenant.current.with 'dummy_1' do
+          ActiveRecord::Base.connection.table_exists?('globals').should_not be_true
+          ActiveRecord::Base.connection.table_exists?('tenants').should be_true
+          ActiveRecord::Base.connection.table_exists?('other_tenants').should be_true
+          ActiveRecord::Base.connection.table_exists?('customs').should_not be_true
+        end
+
+        ActiveTenant.current.with 'dummy_2' do
+          ActiveRecord::Base.connection.table_exists?('globals').should_not be_true
+          ActiveRecord::Base.connection.table_exists?('tenants').should_not be_true
+          ActiveRecord::Base.connection.table_exists?('other_tenants').should_not be_true
+          ActiveRecord::Base.connection.table_exists?('customs').should_not be_true
+        end
+
+        ActiveTenant.current.remove 'dummy_1'
+        ActiveTenant.current.remove 'dummy_2'
+      end
+
+      it 'Migrate all tenants' do
+        ActiveTenant.current.create 'dummy_1'
+        ActiveTenant.current.create 'dummy_2'
+
+        ActiveTenant.current.migrate_all
+
+        ActiveTenant.current.with 'dummy_1' do
+          ActiveRecord::Base.connection.table_exists?('globals').should_not be_true
+          ActiveRecord::Base.connection.table_exists?('tenants').should be_true
+          ActiveRecord::Base.connection.table_exists?('other_tenants').should be_true
+          ActiveRecord::Base.connection.table_exists?('customs').should_not be_true
+        end
+
+        ActiveTenant.current.with 'dummy_2' do
+          ActiveRecord::Base.connection.table_exists?('globals').should_not be_true
+          ActiveRecord::Base.connection.table_exists?('tenants').should be_true
+          ActiveRecord::Base.connection.table_exists?('other_tenants').should be_true
+          ActiveRecord::Base.connection.table_exists?('customs').should_not be_true
+        end
+
+        ActiveTenant.current.remove 'dummy_1'
+        ActiveTenant.current.remove 'dummy_2'
+      end
+
+      it 'Migrate custom tenant' do
+        ActiveTenant.current.create 'custom'
+
+        ActiveTenant.current.migrate 'custom'
+
+        ActiveTenant.current.with 'custom' do
+          ActiveRecord::Base.connection.table_exists?('globals').should_not be_true
+          ActiveRecord::Base.connection.table_exists?('tenants').should be_true
+          ActiveRecord::Base.connection.table_exists?('other_tenants').should be_true
+          ActiveRecord::Base.connection.table_exists?('customs').should be_true
+        end
+
+        ActiveTenant.current.remove 'custom'
+      end
+
+      it 'Migrate to specific version' do
+        ActiveTenant.current.create 'dummy'
+
+        ActiveTenant.current.migrate_all 20120823132854
+
+        ActiveTenant.current.with 'dummy' do
+          ActiveRecord::Base.connection.table_exists?('tenants').should be_true
+          ActiveRecord::Base.connection.table_exists?('other_tenants').should_not be_true
+        end
+
+        ActiveTenant.current.remove 'dummy'
+      end
+      
+    end
+
+    context 'ActiveRecord extensions' do
+
+      it 'Create, migrate and remove' do
+        ActiveRecord::Base.create_tenant 'dummy'
+
+        ActiveRecord::Migration.migrate_all
+
+        ActiveRecord::Base.connection.table_exists?('globals').should be_true
+        ActiveRecord::Base.connection.table_exists?('tenants').should_not be_true
+        ActiveRecord::Base.connection.table_exists?('other_tenants').should_not be_true
+        ActiveRecord::Base.connection.table_exists?('customs').should_not be_true
+
+        ActiveRecord::Base.with_tenant 'dummy' do
+          ActiveRecord::Base.connection.table_exists?('globals').should_not be_true
+          ActiveRecord::Base.connection.table_exists?('tenants').should be_true
+          ActiveRecord::Base.connection.table_exists?('other_tenants').should be_true
+          ActiveRecord::Base.connection.table_exists?('customs').should_not be_true
+        end
+
+        ActiveRecord::Base.remove_tenant 'dummy'
+      end
+
+    end
+
+  end
+
+end

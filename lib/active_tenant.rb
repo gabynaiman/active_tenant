@@ -5,8 +5,17 @@ require 'active_tenant/adapters/sqlite_adapter'
 require 'active_tenant/adapters/postgres_adapter'
 require 'active_tenant/base'
 require 'active_tenant/active_record_extensions'
+require 'active_tenant/configuration'
 
 module ActiveTenant
+
+  def self.configuration
+    @@configuration ||= Configuration.new
+  end
+
+  def self.configure
+    yield(configuration)
+  end
 
   def self.current
     ActiveTenant::Base.new

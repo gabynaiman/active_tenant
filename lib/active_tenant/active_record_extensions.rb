@@ -18,9 +18,21 @@ module ActiveTenant
         ActiveTenant.current.with(name) { yield }
       end
 
+      def tenant_name
+        ActiveTenant.current.name
+      end
+
     end
 
     module Migration
+
+      def tenant(name=nil)
+        name ? @tenant_name = name : @tenant_name
+      end
+
+      def migrate_global(version=nil)
+        ActiveTenant.current.migrate_global version
+      end
 
       def migrate_tenant(name, version=nil)
         ActiveTenant.current.migrate name, version
@@ -28,6 +40,11 @@ module ActiveTenant
 
       def migrate_all_tenants(version=nil)
         ActiveTenant.current.migrate_all version
+      end
+
+      def migrate_all(version=nil)
+        migrate_global version
+        migrate_all_tenants version
       end
 
     end
