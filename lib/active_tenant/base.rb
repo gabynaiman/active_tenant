@@ -8,6 +8,7 @@ module ActiveTenant
     delegate :all, :create, :remove, :with, :name, :global, to: :adapter
 
     def migrate(name, version=nil)
+      ::ActiveRecord::Base.logger.info "[ActiveTenant] Migrating tenant: #{name}"
       with name do
         ::ActiveRecord::Migrator.migrate(::ActiveRecord::Migrator.migrations_path, version) do |migration_proxy|
           [:all, ::ActiveRecord::Base.tenant_name.to_sym].include? migration_proxy.send(:migration).class.tenant
@@ -22,6 +23,7 @@ module ActiveTenant
     end
 
     def migrate_global(version=nil)
+      ::ActiveRecord::Base.logger.info '[ActiveTenant] Migrating global db'
       with global do
         ::ActiveRecord::Migrator.migrate(::ActiveRecord::Migrator.migrations_path, version) do |migration_proxy|
           migration_proxy.send(:migration).class.tenant.nil?
