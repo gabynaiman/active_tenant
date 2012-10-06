@@ -5,7 +5,7 @@ module ActiveTenant
         postgresql: PostgresAdapter
     }
 
-    delegate :all, :create, :remove, :with, :name, :global, to: :adapter
+    delegate :all, :create, :remove, :with, :name, :global, :global?, to: :adapter
 
     def migrate(name, version=nil)
       ::ActiveRecord::Base.logger.info "[ActiveTenant] Migrating tenant: #{name}"

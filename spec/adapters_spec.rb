@@ -183,6 +183,9 @@ ActiveTenant::Base::ADAPTERS.keys.each do |adapter_name|
     context 'ActiveRecord extensions' do
 
       it 'Create, migrate and remove' do
+        ActiveRecord::Base.tenant?.should be_false
+        ActiveRecord::Base.tenant_name.should be_nil
+
         ActiveRecord::Base.create_tenant 'dummy'
 
         ActiveRecord::Migration.migrate_all
@@ -193,6 +196,9 @@ ActiveTenant::Base::ADAPTERS.keys.each do |adapter_name|
         ActiveRecord::Base.connection.table_exists?('customs').should_not be_true
 
         ActiveRecord::Base.with_tenant 'dummy' do
+          ActiveRecord::Base.tenant?.should be_true
+          ActiveRecord::Base.tenant_name.should eq 'dummy'
+
           ActiveRecord::Base.connection.table_exists?('globals').should_not be_true
           ActiveRecord::Base.connection.table_exists?('tenants').should be_true
           ActiveRecord::Base.connection.table_exists?('other_tenants').should be_true
@@ -200,6 +206,9 @@ ActiveTenant::Base::ADAPTERS.keys.each do |adapter_name|
         end
 
         ActiveRecord::Base.remove_tenant 'dummy'
+
+        ActiveRecord::Base.tenant?.should be_false
+        ActiveRecord::Base.tenant_name.should be_nil
       end
 
     end

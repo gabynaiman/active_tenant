@@ -50,6 +50,10 @@ module ActiveTenant
       @global
     end
 
+    def global?
+      global == name
+    end
+
     private
 
     def global=(name)

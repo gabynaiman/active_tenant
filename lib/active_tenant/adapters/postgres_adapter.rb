@@ -47,6 +47,10 @@ module ActiveTenant
       @global || 'public'
     end
 
+    def global?
+      global == name
+    end
+
     private
 
     def global=(name)
