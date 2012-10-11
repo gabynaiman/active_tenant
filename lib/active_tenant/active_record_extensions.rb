@@ -18,8 +18,12 @@ module ActiveTenant
         ActiveTenant.current.with(name) { yield }
       end
 
+      def tenant?
+        !ActiveTenant.current.global?
+      end
+
       def tenant_name
-        ActiveTenant.current.name
+        ActiveTenant.current.name if tenant?
       end
 
     end
