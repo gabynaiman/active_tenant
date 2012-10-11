@@ -95,9 +95,9 @@ ActiveTenant::Base::ADAPTERS.keys.each do |adapter_name|
         ActiveTenant.current.migrate_global
 
         ActiveRecord::Base.connection.table_exists?('globals').should be_true
-        ActiveRecord::Base.connection.table_exists?('tenants').should_not be_true
-        ActiveRecord::Base.connection.table_exists?('other_tenants').should_not be_true
-        ActiveRecord::Base.connection.table_exists?('customs').should_not be_true
+        ActiveRecord::Base.connection.table_exists?('tenants').should be_false
+        ActiveRecord::Base.connection.table_exists?('other_tenants').should be_false
+        ActiveRecord::Base.connection.table_exists?('customs').should be_false
 
         ActiveTenant.current.remove 'dummy'
       end
@@ -109,17 +109,17 @@ ActiveTenant::Base::ADAPTERS.keys.each do |adapter_name|
         ActiveTenant.current.migrate 'dummy_1'
 
         ActiveTenant.current.with 'dummy_1' do
-          ActiveRecord::Base.connection.table_exists?('globals').should_not be_true
+          ActiveRecord::Base.connection.table_exists?('globals').should be_false
           ActiveRecord::Base.connection.table_exists?('tenants').should be_true
           ActiveRecord::Base.connection.table_exists?('other_tenants').should be_true
-          ActiveRecord::Base.connection.table_exists?('customs').should_not be_true
+          ActiveRecord::Base.connection.table_exists?('customs').should be_false
         end
 
         ActiveTenant.current.with 'dummy_2' do
-          ActiveRecord::Base.connection.table_exists?('globals').should_not be_true
-          ActiveRecord::Base.connection.table_exists?('tenants').should_not be_true
-          ActiveRecord::Base.connection.table_exists?('other_tenants').should_not be_true
-          ActiveRecord::Base.connection.table_exists?('customs').should_not be_true
+          ActiveRecord::Base.connection.table_exists?('globals').should be_false
+          ActiveRecord::Base.connection.table_exists?('tenants').should be_false
+          ActiveRecord::Base.connection.table_exists?('other_tenants').should be_false
+          ActiveRecord::Base.connection.table_exists?('customs').should be_false
         end
 
         ActiveTenant.current.remove 'dummy_1'
@@ -133,17 +133,17 @@ ActiveTenant::Base::ADAPTERS.keys.each do |adapter_name|
         ActiveTenant.current.migrate_all
 
         ActiveTenant.current.with 'dummy_1' do
-          ActiveRecord::Base.connection.table_exists?('globals').should_not be_true
+          ActiveRecord::Base.connection.table_exists?('globals').should be_false
           ActiveRecord::Base.connection.table_exists?('tenants').should be_true
           ActiveRecord::Base.connection.table_exists?('other_tenants').should be_true
-          ActiveRecord::Base.connection.table_exists?('customs').should_not be_true
+          ActiveRecord::Base.connection.table_exists?('customs').should be_false
         end
 
         ActiveTenant.current.with 'dummy_2' do
-          ActiveRecord::Base.connection.table_exists?('globals').should_not be_true
+          ActiveRecord::Base.connection.table_exists?('globals').should be_false
           ActiveRecord::Base.connection.table_exists?('tenants').should be_true
           ActiveRecord::Base.connection.table_exists?('other_tenants').should be_true
-          ActiveRecord::Base.connection.table_exists?('customs').should_not be_true
+          ActiveRecord::Base.connection.table_exists?('customs').should be_false
         end
 
         ActiveTenant.current.remove 'dummy_1'
@@ -156,7 +156,7 @@ ActiveTenant::Base::ADAPTERS.keys.each do |adapter_name|
         ActiveTenant.current.migrate 'custom'
 
         ActiveTenant.current.with 'custom' do
-          ActiveRecord::Base.connection.table_exists?('globals').should_not be_true
+          ActiveRecord::Base.connection.table_exists?('globals').should be_false
           ActiveRecord::Base.connection.table_exists?('tenants').should be_true
           ActiveRecord::Base.connection.table_exists?('other_tenants').should be_true
           ActiveRecord::Base.connection.table_exists?('customs').should be_true
@@ -172,7 +172,7 @@ ActiveTenant::Base::ADAPTERS.keys.each do |adapter_name|
 
         ActiveTenant.current.with 'dummy' do
           ActiveRecord::Base.connection.table_exists?('tenants').should be_true
-          ActiveRecord::Base.connection.table_exists?('other_tenants').should_not be_true
+          ActiveRecord::Base.connection.table_exists?('other_tenants').should be_false
         end
 
         ActiveTenant.current.remove 'dummy'
@@ -188,15 +188,15 @@ ActiveTenant::Base::ADAPTERS.keys.each do |adapter_name|
         ActiveRecord::Migration.migrate_all
 
         ActiveRecord::Base.connection.table_exists?('globals').should be_true
-        ActiveRecord::Base.connection.table_exists?('tenants').should_not be_true
-        ActiveRecord::Base.connection.table_exists?('other_tenants').should_not be_true
-        ActiveRecord::Base.connection.table_exists?('customs').should_not be_true
+        ActiveRecord::Base.connection.table_exists?('tenants').should be_false
+        ActiveRecord::Base.connection.table_exists?('other_tenants').should be_false
+        ActiveRecord::Base.connection.table_exists?('customs').should be_false
 
         ActiveRecord::Base.with_tenant 'dummy' do
-          ActiveRecord::Base.connection.table_exists?('globals').should_not be_true
+          ActiveRecord::Base.connection.table_exists?('globals').should be_false
           ActiveRecord::Base.connection.table_exists?('tenants').should be_true
           ActiveRecord::Base.connection.table_exists?('other_tenants').should be_true
-          ActiveRecord::Base.connection.table_exists?('customs').should_not be_true
+          ActiveRecord::Base.connection.table_exists?('customs').should be_false
         end
 
         ActiveRecord::Base.remove_tenant 'dummy'
