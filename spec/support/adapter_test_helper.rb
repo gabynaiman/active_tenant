@@ -24,13 +24,13 @@ module AdapterTestHelper
 
   def self.sqlite3_before_each
     ActiveTenant.configuration.global = 'test'
-    ActiveRecord::Base.establish_connection adapter: 'sqlite3', database: "#{TEMP_PATH}/test.sqlite3"
+    ActiveRecord::Base.establish_connection adapter: 'sqlite3', database: "#{temp_path}/test.sqlite3"
     ActiveRecord::Base.connection
   end
 
   def self.sqlite3_after_each
     ActiveRecord::Base.connection.disconnect!
-    Dir.glob("#{TEMP_PATH}/*.sqlite3").each do |file|
+    Dir.glob("#{temp_path}/*.sqlite3").each do |file|
       FileUtils.rm(file)
     end
   end
@@ -54,6 +54,14 @@ module AdapterTestHelper
     config = ActiveRecord::Base.connection_config
     ActiveRecord::Base.establish_connection config.merge database: 'postgres'
     ActiveRecord::Base.connection.drop_database config[:database]
+  end
+
+  private
+
+  def self.temp_path
+    path = Pathname.new("#{File.dirname(__FILE__)}/../../tmp").expand_path.to_s
+    FileUtils.mkpath path unless Dir.exist? path
+    path
   end
 
 end

@@ -1,9 +1,8 @@
 require 'spec_helper'
 
-ActiveTenant::Base::ADAPTERS.keys.each do |adapter_name|
-  adapter = ActiveTenant::Base::ADAPTERS[adapter_name]
+ActiveTenant::Base::ADAPTERS.each do |adapter_name, adapter_class|
 
-  describe adapter do
+  describe adapter_class do
 
     before :all do
       AdapterTestHelper.before_all adapter_name
@@ -23,7 +22,7 @@ ActiveTenant::Base::ADAPTERS.keys.each do |adapter_name|
 
     context 'Specific adapter' do
 
-      let(:tenant_adapter) { adapter.new }
+      let(:tenant_adapter) { adapter_class.new }
 
       it 'List all tenants' do
         tenants = tenant_adapter.all
