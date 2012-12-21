@@ -26,6 +26,7 @@ module AdapterTestHelper
     ActiveTenant.configuration.global = 'test'
     ActiveRecord::Base.establish_connection adapter: 'sqlite3', database: "#{temp_path}/test.sqlite3"
     ActiveRecord::Base.connection
+    load 'models.rb'
   end
 
   def self.sqlite3_after_each
@@ -48,11 +49,13 @@ module AdapterTestHelper
     ActiveRecord::Base.connection.drop_database config[:database] rescue nil
     ActiveRecord::Base.connection.create_database config[:database]
     ActiveRecord::Base.establish_connection config
+    load 'models.rb'
   end
 
   def self.postgresql_after_all
     config = ActiveRecord::Base.connection_config
     ActiveRecord::Base.establish_connection config.merge database: 'postgres'
+    ActiveRecord::Base.disconnect!
     ActiveRecord::Base.connection.drop_database config[:database]
   end
 

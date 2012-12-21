@@ -31,7 +31,7 @@ module ActiveTenant
       current_config = connection_config
       ex = nil
       begin
-        establish_connection current_config.merge(database: file_name(name))
+        establish_connection connection_settings(name)
         result = yield
       rescue => e
         ex = e
@@ -40,6 +40,10 @@ module ActiveTenant
         raise ex unless ex.nil?
         result
       end
+    end
+
+    def connection_settings(name)
+      connection_config.merge(database: file_name(name))
     end
 
     def name

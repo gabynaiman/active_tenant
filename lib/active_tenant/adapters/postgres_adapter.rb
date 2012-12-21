@@ -39,6 +39,10 @@ module ActiveTenant
       end
     end
 
+    def connection_settings(name)
+      connection_config.merge(schema_search_path: name)
+    end
+
     def name
       search_path
     end
@@ -59,8 +63,7 @@ module ActiveTenant
 
     def search_path(name=nil)
       if name
-        connection.execute("SET SEARCH_PATH TO \"#{name}\"")
-        establish_connection connection_config.merge(schema_search_path: name)
+        establish_connection connection_settings(name)
       else
         connection_config[:schema_search_path]
       end

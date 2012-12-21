@@ -26,6 +26,10 @@ module ActiveTenant
         ActiveTenant.current.name if tenant?
       end
 
+      def belongs_to_global_tenant
+        establish_connection ActiveTenant.current.connection_settings(ActiveTenant.current.global)
+      end
+
     end
 
     module Migration

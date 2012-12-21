@@ -176,7 +176,7 @@ ActiveTenant::Base::ADAPTERS.each do |adapter_name, adapter_class|
 
         ActiveTenant.current.remove 'dummy'
       end
-      
+
     end
 
     context 'ActiveRecord extensions' do
@@ -208,6 +208,39 @@ ActiveTenant::Base::ADAPTERS.each do |adapter_name, adapter_class|
 
         ActiveRecord::Base.tenant?.should be_false
         ActiveRecord::Base.tenant_name.should be_nil
+      end
+
+    end
+
+    context 'Models' do
+
+      it 'Globals always visible' do
+        ActiveTenant.current.create 'dummy_1'
+        ActiveTenant.current.create 'dummy_2'
+
+        ActiveTenant.current.migrate_global
+        ActiveTenant.current.migrate_all
+
+        Global.count.should eq 0
+
+        ActiveTenant.current.with('dummy_1') do
+          Tenant.count.should eq 0
+        end
+
+        ActiveTenant.current.with('dummy_2') do
+          Tenant.create! key: '1', value: 'dummy_2'
+          Global.create! key: '2', value: 'global'
+
+          Tenant.count.should eq 1
+          Global.count.should eq 1
+        end
+
+        Global.count.should eq 1
+
+        ActiveTenant.current.with('dummy_1') do
+          Tenant.count.should eq 0
+          Global.count.should eq 1
+        end
       end
 
     end
