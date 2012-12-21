@@ -1,8 +1,8 @@
 # ActiveTenant
 
-ActiveRecord extensions for multi tenant applications
-
 [![Build Status](https://travis-ci.org/gabynaiman/active_tenant.png?branch=master)](https://travis-ci.org/gabynaiman/active_tenant)
+
+ActiveRecord extensions for multi tenant applications
 
 ## Installation
 

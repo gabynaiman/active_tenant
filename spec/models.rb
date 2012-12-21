@@ -1,5 +1,5 @@
 class Global < ActiveRecord::Base
-  belongs_to_global_tenant
+  belongs_to_tenant_global
 end
 
 class Tenant < ActiveRecord::Base
