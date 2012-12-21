@@ -2,6 +2,8 @@
 
 ActiveRecord extensions for multi tenant applications
 
+[![Build Status](https://travis-ci.org/gabynaiman/active_tenant.png?branch=master)](https://travis-ci.org/gabynaiman/active_tenant)
+
 ## Installation
 
 Add this line to your application's Gemfile:
