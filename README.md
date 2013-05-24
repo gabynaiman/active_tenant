@@ -1,5 +1,6 @@
 # ActiveTenant
 
+[![Gem Version](https://badge.fury.io/rb/active_tenant.png)](https://rubygems.org/gems/active_tenant)
 [![Build Status](https://travis-ci.org/gabynaiman/active_tenant.png?branch=master)](https://travis-ci.org/gabynaiman/active_tenant)
 
 ActiveRecord extensions for multi tenant applications
