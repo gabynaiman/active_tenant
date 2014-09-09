@@ -24,7 +24,8 @@ module AdapterTestHelper
 
   def self.sqlite3_before_each
     ActiveTenant.configuration.global = 'test'
-    ActiveRecord::Base.establish_connection adapter: 'sqlite3', database: "#{temp_path}/test.sqlite3"
+    adapter = RUBY_ENGINE == 'jruby' ? 'jdbcsqlite3' : 'sqlite3'
+    ActiveRecord::Base.establish_connection adapter: adapter, database: "#{temp_path}/test.sqlite3"
     ActiveRecord::Base.connection
     load 'models.rb'
   end
@@ -52,12 +53,12 @@ module AdapterTestHelper
     load 'models.rb'
   end
 
-  def self.postgresql_after_all
-    config = ActiveRecord::Base.connection_config
-    ActiveRecord::Base.establish_connection config.merge database: 'postgres'
-    ActiveRecord::Base.disconnect!
-    ActiveRecord::Base.connection.drop_database config[:database]
-  end
+  # TODO: Remove database after run all tests
+  # def self.postgresql_after_all
+  #   config = ActiveRecord::Base.connection_config
+  #   ActiveRecord::Base.establish_connection config.merge database: 'postgres'
+  #   ActiveRecord::Base.connection.drop_database config[:database]
+  # end
 
   private
 

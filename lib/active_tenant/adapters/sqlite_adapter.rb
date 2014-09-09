@@ -14,7 +14,7 @@ module ActiveTenant
     def create(name)
       unless all.include? name
         current_config = connection_config
-        establish_connection current_config.merge(database: file_name(name))
+        establish_connection connection_settings(name)
         connection
         establish_connection current_config
       end
@@ -43,7 +43,7 @@ module ActiveTenant
     end
 
     def connection_settings(name)
-      connection_config.merge(database: file_name(name))
+      connection_config.merge(database: file_name(name), url: nil)
     end
 
     def name

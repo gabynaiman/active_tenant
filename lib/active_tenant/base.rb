@@ -34,7 +34,7 @@ module ActiveTenant
     private
 
     def adapter
-      @adapter ||= ADAPTERS[::ActiveRecord::Base.connection_config[:adapter].to_sym].new
+      @adapter ||= ADAPTERS[::ActiveRecord::Base.connection_config[:adapter].to_s.gsub('jdbc', '').to_sym].new
     end
 
   end
